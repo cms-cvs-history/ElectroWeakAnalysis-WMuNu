@@ -17,7 +17,6 @@ process.wmnAnalyzer = cms.EDFilter("WMuNuAnalyzer",
     #EtaCut = cms.double(2.1),
     #IsRelativeIso = cms.bool(True),
     #IsoCut03 = cms.double(0.1),
-    #IsoCut05 = cms.double(999999.),
     #MassTMin = cms.double(50.0),
     #MassTMax = cms.double(200.0),
     #
