@@ -264,9 +264,9 @@ bool WMuNuPATSelector::filter (edm::Event & ev, const edm::EventSetup &) {
 
             //if(mu.charge()!=1) continue;
 
-            if (pt<ptCut_-2*mu.globalTrack()->ptError()) continue;
-            //LogTrace("") << "\t... eta= " << eta;
-            if (fabs(eta)>etaCut_+2*mu.globalTrack()->etaError()) continue;
+            if (pt<ptCut_-2*mu.resolutionEt()) continue;
+            if (fabs(eta)>etaCut_+2*mu.resolutionEta()) continue;
+            LogTrace("") << "\t... pt Resolution = " << mu.resolutionEt() << ", etaResolution = " << mu.resolutionEta();
             nrec++;
 
             double iso_weight = my_weight(eta,"ISO");
