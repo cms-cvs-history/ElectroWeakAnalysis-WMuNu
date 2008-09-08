@@ -274,7 +274,7 @@ bool WMuNuPATSelector::filter (edm::Event & ev, const edm::EventSetup &) {
 
             bool iso = false;
             double ptsum = mu.isolationR03().sumPt;
-            if (ptsum/pt<0.09){iso=true;};
+            if (ptsum/pt<isoCut03_){iso=true;};
  
             LogTrace("") << "\t... isolated? " << iso;
             if (!iso) continue;
