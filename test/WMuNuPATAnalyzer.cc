@@ -135,12 +135,14 @@ void WMuNuPATAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
    
    LogTrace("Analyzer")<<"Reconstructed Muon tracks: " << muonCollection->size() << endl;
    numberOfMuons += muonCollection->size();
+   /* Already accounted for in PAT
    for(size_t im = 0; im<muonCollection->size(); ++im) {
       const Muon& mu = muonCollection->at(im);
       //if (useOnlyGlobalMuons_ && !mu.isGlobalMuon()) continue;
       met_px -= mu.px();
       met_py -= mu.py();
    }
+   */
 
   // Get the MET collection from the event
    Handle<View<MET> > metCollection;

@@ -141,12 +141,14 @@ bool WMuNuPATSelector::filter (edm::Event & ev, const edm::EventSetup &) {
             return false;
       }
    
+      /* Already accounted for in MET
       for(size_t im = 0; im<muonCollection->size(); ++im) {
             const Muon& mu = muonCollection->at(im);
             //if (useOnlyGlobalMuons_ && !mu.isGlobalMuon()) continue;
             met_px -= mu.px();
             met_py -= mu.py();
       }
+      */
 
       // Get the MET collection from the event
       Handle<View<MET> > metCollection;
