@@ -254,6 +254,7 @@ bool WMuNuPATSelector::filter (edm::Event & ev, const edm::EventSetup &) {
       for (unsigned int i=0; i<muonCollection->size(); i++) {
             const Muon& mu = muonCollection->at(i);
             //if (useOnlyGlobalMuons_ && !mu.isGlobalMuon()) continue;
+            if (mu.track().isNull()) continue;
             LogTrace("") << "> Processing muon number " << i << "...";
             double pt = mu.pt();
             if (pt>ptThrForZCount_) nmuonsForZ++;
@@ -266,9 +267,9 @@ bool WMuNuPATSelector::filter (edm::Event & ev, const edm::EventSetup &) {
 
             //if(mu.charge()!=1) continue;
 
-            if (pt<ptCut_-2*mu.resolutionEt()) continue;
-            if (fabs(eta)>etaCut_+2*mu.resolutionEta()) continue;
-            LogTrace("") << "\t... pt Resolution = " << mu.resolutionEt() << ", etaResolution = " << mu.resolutionEta();
+            if (pt<ptCut_-2*mu.track()->ptError()) continue;
+            if (fabs(eta)>etaCut_+2*mu.track()->ptError()) continue;
+            LogTrace("") << "\t... pt Resolution = " << mu.track()->ptError() << ", etaResolution = " << mu.track()->etaError();
             nrec++;
 
             double iso_weight = my_weight(eta,"ISO");

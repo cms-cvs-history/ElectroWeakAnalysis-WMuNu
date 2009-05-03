@@ -20,9 +20,12 @@
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
-#include "DataFormats/PatCandidates/interface/Tau.h"
+//#include "DataFormats/PatCandidates/interface/Tau.h"
 #include "DataFormats/PatCandidates/interface/Photon.h"
 #include "DataFormats/PatCandidates/interface/MET.h"
+
+#include "DataFormats/JetReco/interface/PFJet.h"
+#include "DataFormats/METReco/interface/PFMET.h"
 
 #include "TH1D.h"
 #include <map>
@@ -52,9 +55,11 @@ class PATAnalyzer : public edm::EDAnalyzer {
   edm::InputTag eleLabel_;
   edm::InputTag muoLabel_;
   edm::InputTag jetLabel_;
-  edm::InputTag tauLabel_;
+  //edm::InputTag tauLabel_;
   edm::InputTag metLabel_;
   edm::InputTag phoLabel_;
+  edm::InputTag pfjetLabel_;
+  edm::InputTag pfmetLabel_;
 };
 
 //
@@ -73,9 +78,11 @@ PATAnalyzer::PATAnalyzer(const edm::ParameterSet& iConfig):
   eleLabel_(iConfig.getUntrackedParameter<edm::InputTag>("electronTag")),
   muoLabel_(iConfig.getUntrackedParameter<edm::InputTag>("muonTag")),
   jetLabel_(iConfig.getUntrackedParameter<edm::InputTag>("jetTag")),
-  tauLabel_(iConfig.getUntrackedParameter<edm::InputTag>("tauTag")),
+  //tauLabel_(iConfig.getUntrackedParameter<edm::InputTag>("tauTag")),
   metLabel_(iConfig.getUntrackedParameter<edm::InputTag>("metTag")),
-  phoLabel_(iConfig.getUntrackedParameter<edm::InputTag>("photonTag"))
+  phoLabel_(iConfig.getUntrackedParameter<edm::InputTag>("photonTag")),
+  pfjetLabel_(iConfig.getUntrackedParameter<edm::InputTag>("pfJetTag")),
+  pfmetLabel_(iConfig.getUntrackedParameter<edm::InputTag>("pfMetTag"))
 
 {
    //now do whatever initialization is needed
@@ -121,15 +128,23 @@ PATAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
    edm::Handle<edm::View<pat::MET> > metHandle;
    iEvent.getByLabel(metLabel_,metHandle);
-   edm::View<pat::MET> mets = *metHandle;
+   edm::View<pat::MET> met = *metHandle;
 
    edm::Handle<edm::View<pat::Photon> > phoHandle;
    iEvent.getByLabel(phoLabel_,phoHandle);
    edm::View<pat::Photon> photons = *phoHandle;
 
-   edm::Handle<edm::View<pat::Tau> > tauHandle;
-   iEvent.getByLabel(tauLabel_,tauHandle);
-   edm::View<pat::Tau> taus = *tauHandle;
+   //edm::Handle<edm::View<pat::Tau> > tauHandle;
+   //iEvent.getByLabel(tauLabel_,tauHandle);
+   //edm::View<pat::Tau> taus = *tauHandle;
+
+   edm::Handle<edm::View<reco::PFJet> > pfjetHandle;
+   iEvent.getByLabel(pfjetLabel_,pfjetHandle);
+   edm::View<reco::PFJet> pfjets = *pfjetHandle;
+
+   edm::Handle<edm::View<reco::PFMET> > pfmetHandle;
+   iEvent.getByLabel(pfmetLabel_,pfmetHandle);
+   edm::View<reco::PFMET> pfmet = *pfmetHandle;
 
    //{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}
    // example of a loop over objects... this works identical for all vectors defined above
@@ -144,7 +159,13 @@ PATAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    for(size_t ij = 0; ij<jets.size(); ++ij) {
      const pat::Jet& jet = jets[ij];
      //if(jet_iter->pt()>50)
-     if(jet.pt()>50) njetscounter++;
+     if(jet.pt()>15) njetscounter++;
+   }
+
+   size_t npfjetscounter=0;
+   for(size_t ij = 0; ij<pfjets.size(); ++ij) {
+     const reco::PFJet& jet = pfjets[ij];
+     if(jet.pt()>15) npfjetscounter++;
    }
 
    //{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}
@@ -156,13 +177,16 @@ PATAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    //{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}
    
    histocontainer_["njets"]->Fill(njetscounter);
+   histocontainer_["npfjets"]->Fill(npfjetscounter);
    //{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}
    // for the other objects just quickly book the multiplicity. Again, just use the same infrastructure as for jets if you want to loop over them.
    //{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}
    histocontainer_["nelectrons"]->Fill(electrons.size());
    histocontainer_["nphotons"]->Fill(photons.size());
    histocontainer_["nmuons"]->Fill(muons.size());
-   histocontainer_["ntaus"]->Fill(taus.size());
+   histocontainer_["met"]->Fill(met[0].et());
+   histocontainer_["pfmet"]->Fill(pfmet[0].et());
+   //histocontainer_["ntaus"]->Fill(taus.size());
 }
 // ------------ method called once each job just before starting event loop  ------------
 void 
@@ -186,11 +210,15 @@ PATAnalyzer::beginJob(const edm::EventSetup&)
   // here we book new histograms:
   //{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}
 
-  histocontainer_["njets"]=fs->make<TH1D>("njets","jet multiplicity for jets with p_{T} > 50 GeV/c",10,0,10);
-  histocontainer_["nelectrons"]=fs->make<TH1D>("nelectrons","electron multiplicity",10,0,10);
-  histocontainer_["ntaus"]=fs->make<TH1D>("ntaus","tau multiplicity",10,0,10);
-  histocontainer_["nphotons"]=fs->make<TH1D>("nphotons","photon multiplicity",10,0,10);
-  histocontainer_["nmuons"]=fs->make<TH1D>("nmuons","muon multiplicity",10,0,10);
+  histocontainer_["njets"]=fs->make<TH1D>("njets","jet multiplicity for jets with p_{T} > 15 GeV/c",10,-0.5,9.5);
+  histocontainer_["npfjets"]=fs->make<TH1D>("npfjets","PFlow jet multiplicity for jets with p_{T} > 15 GeV/c",10,-0.5,9.5);
+
+  histocontainer_["nelectrons"]=fs->make<TH1D>("nelectrons","electron multiplicity",10,-0.5,9.5);
+  //histocontainer_["ntaus"]=fs->make<TH1D>("ntaus","tau multiplicity",10,-0.5,9.5);
+  histocontainer_["nphotons"]=fs->make<TH1D>("nphotons","photon multiplicity",10,-0.5,9.5);
+  histocontainer_["nmuons"]=fs->make<TH1D>("nmuons","muon multiplicity",10,-0.5,9.5);
+  histocontainer_["met"]=fs->make<TH1D>("met","MET [GeV]",100,0.,200.);
+  histocontainer_["pfmet"]=fs->make<TH1D>("pfmet","PFlow MET [GeV]",100,0.,200.);
 
 }
 
