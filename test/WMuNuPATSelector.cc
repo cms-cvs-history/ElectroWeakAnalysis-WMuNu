@@ -40,6 +40,7 @@ class WMuNuPATSelector : public edm::EDFilter {
       double my_weight(double eta, const std::string mode);
 
    private:
+      edm::InputTag genLabel_;
       edm::InputTag muoLabel_;
       edm::InputTag jetLabel_;
       edm::InputTag metLabel_;
@@ -75,6 +76,7 @@ using namespace std;
 using namespace pat;
 
 WMuNuPATSelector::WMuNuPATSelector(const edm::ParameterSet& iConfig):
+  genLabel_(iConfig.getUntrackedParameter<edm::InputTag>("genTag")),
   muoLabel_(iConfig.getUntrackedParameter<edm::InputTag>("muonTag")),
   jetLabel_(iConfig.getUntrackedParameter<edm::InputTag>("jetTag")),
   metLabel_(iConfig.getUntrackedParameter<edm::InputTag>("metTag")),
@@ -180,7 +182,7 @@ bool WMuNuPATSelector::filter (edm::Event & ev, const edm::EventSetup &) {
       bool genfound = false;
 
       Handle<reco::GenParticleCollection> genParticles;
-      if (!ev.getByLabel("genParticles", genParticles)) {
+      if (!ev.getByLabel(genLabel_, genParticles)) {
             cout<<"genParticles dont exist!!!"<<endl;
             return false;
       }
@@ -254,22 +256,23 @@ bool WMuNuPATSelector::filter (edm::Event & ev, const edm::EventSetup &) {
       for (unsigned int i=0; i<muonCollection->size(); i++) {
             const Muon& mu = muonCollection->at(i);
             //if (useOnlyGlobalMuons_ && !mu.isGlobalMuon()) continue;
-            if (mu.track().isNull()) continue;
+            if (mu.innerTrack().isNull()) continue;
+            const reco::Track& tk = *(mu.innerTrack());
             LogTrace("") << "> Processing muon number " << i << "...";
-            double pt = mu.pt();
+            double pt = tk.pt();
             if (pt>ptThrForZCount_) nmuonsForZ++;
             LogTrace("") << "\t... pt= " << pt << " GeV";
   //          if (pt<ptCut_) continue;
-            double eta = mu.eta();
+            double eta = tk.eta();
             LogTrace("") << "\t... eta= " << eta;
 //            if (fabs(eta)>etaCut_) continue;
 
 
-            //if(mu.charge()!=1) continue;
+            //if(tk.charge()!=1) continue;
 
-            if (pt<ptCut_-2*mu.track()->ptError()) continue;
-            if (fabs(eta)>etaCut_+2*mu.track()->ptError()) continue;
-            LogTrace("") << "\t... pt Resolution = " << mu.track()->ptError() << ", etaResolution = " << mu.track()->etaError();
+            if (pt<ptCut_-2*tk.ptError()) continue;
+            if (fabs(eta)>etaCut_+2*tk.ptError()) continue;
+            LogTrace("") << "\t... pt Resolution = " << tk.ptError() << ", etaResolution = " << tk.etaError();
             nrec++;
 
             double iso_weight = my_weight(eta,"ISO");
@@ -289,9 +292,9 @@ bool WMuNuPATSelector::filter (edm::Event & ev, const edm::EventSetup &) {
             if (!fired) continue;
             nhlt++;
 
-            double w_et = mu.pt() + met_et;
-            double w_px = mu.px() + met_px;
-            double w_py = mu.py() + met_py;
+            double w_et = tk.pt() + met_et;
+            double w_px = tk.px() + met_px;
+            double w_py = tk.py() + met_py;
             double massT = w_et*w_et - w_px*w_px - w_py*w_py;
             massT = (massT>0) ? sqrt(massT) : 0;
             LogTrace("") << "\t... W_et, W_px, W_py= " << w_et << ", " << w_px << ", " << w_py << " GeV";
@@ -304,7 +307,7 @@ bool WMuNuPATSelector::filter (edm::Event & ev, const edm::EventSetup &) {
             LogTrace("") << ">>> Number of jets above " << eJetMin_ << " GeV: " << njets;
             if (njets>nJetMax_) return false;
 
-            Geom::Phi<double> deltaphi(mu.phi()-atan2(met_py,met_px));
+            Geom::Phi<double> deltaphi(tk.phi()-atan2(met_py,met_px));
             double acop = deltaphi.value();
             if (acop<0) acop = - acop;
             acop = M_PI - acop;
