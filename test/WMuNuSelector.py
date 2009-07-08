@@ -1,25 +1,42 @@
 import FWCore.ParameterSet.Config as cms
 
+# Process, how many events, inout files, ...
 process = cms.Process("wmnsel")
+process.maxEvents = cms.untracked.PSet(
+      #input = cms.untracked.int32(-1)
+      input = cms.untracked.int32(100)
+)
+process.source = cms.Source("PoolSource",
+      debugVerbosity = cms.untracked.uint32(0),
+      debugFlag = cms.untracked.bool(False),
+      fileNames = cms.untracked.vstring("file:/data4/RelValWM_CMSSW_3_1_0-STARTUP31X_V1-v1_GEN-SIM-RECO/40BFAA1A-5466-DE11-B792-001D09F29533.root")
+)
 
+# Selector and parameters
 process.wmnSelFilter = cms.EDFilter("WMuNuSelector",
       # Input collections ->
-      GenParticlesTag = cms.untracked.InputTag("prunedGenParticles"),
+      TrigTag = cms.untracked.InputTag("TriggerResults::HLT"),
       MuonTag = cms.untracked.InputTag("muons"),
       METTag = cms.untracked.InputTag("met"),
-      JetTag = cms.untracked.InputTag("iterativeCone5CaloJets"),
-      UseOnlyGlobalMuons = cms.untracked.bool(True),
+      METType = cms.untracked.string("reco::CaloMET"),
+      METIncludesMuons = cms.untracked.bool(False),
+      JetTag = cms.untracked.InputTag("sisCone5CaloJets"),
+      JetType = cms.untracked.string("reco::CaloJet"),
       #
       # Main cuts ->
+      MuonTrig = cms.untracked.string("HLT_Mu9"),
+      UseOnlyGlobalMuons = cms.untracked.bool(True),
       PtCut = cms.untracked.double(25.0),
       EtaCut = cms.untracked.double(2.1),
       IsRelativeIso = cms.untracked.bool(True),
+      IsCombinedIso = cms.untracked.bool(False),
       IsoCut03 = cms.untracked.double(0.1),
       MassTMin = cms.untracked.double(50.0),
       MassTMax = cms.untracked.double(200.0),
       #
       # To suppress Zmm ->
-      PtThrForZCount = cms.untracked.double(20.0),
+      PtThrForZ1 = cms.untracked.double(20.0),
+      PtThrForZ2 = cms.untracked.double(10.0),
       #
       # To suppress ttbar ->
       AcopCut = cms.untracked.double(999999.),
@@ -27,56 +44,28 @@ process.wmnSelFilter = cms.EDFilter("WMuNuSelector",
       NJetMax = cms.untracked.int32(999999)
 )
 
-
-process.load("Configuration.EventContent.EventContent_cff")
-
+# Debug/info printouts
 process.MessageLogger = cms.Service("MessageLogger",
       debugModules = cms.untracked.vstring('wmnSelFilter'),
-      categories = cms.untracked.vstring('FwkJob','FwkReport','FwkSummary','Root_NoDictionary'),
       cout = cms.untracked.PSet(
+            #default = cms.untracked.PSet( limit = cms.untracked.int32(10) )
+            #threshold = cms.untracked.string('INFO')
             threshold = cms.untracked.string('DEBUG')
       ),
       destinations = cms.untracked.vstring('cout')
 )
 
-process.AdaptorConfig = cms.Service("AdaptorConfig")
-
-process.maxEvents = cms.untracked.PSet(
-      #input = cms.untracked.int32(-1)
-      input = cms.untracked.int32(100)
-)
-
-# Input files (on disk)
-import os
-dirname = "/data4/Summer08_Wmunu_IDEAL_V11_redigi_v2_AODRED/"
-index_first_file = 0
-files_per_job = 1
-
-process.source = cms.Source("PoolSource",
-      debugVerbosity = cms.untracked.uint32(0),
-      debugFlag = cms.untracked.bool(False),
-      fileNames = cms.untracked.vstring()
-)
-
-index = -1
-basenamelist = os.listdir(dirname)
-for basename in basenamelist:
-      if (len(process.source.fileNames)>=files_per_job): break
-      index += 1
-      if (index<index_first_file): continue
-      this_file = "file:" + dirname + basename
-      process.source.fileNames.append(this_file)
-      print "File to be used: %s" % (this_file)
-print "Number of files to process is %s" % (len(process.source.fileNames))
-
+# Output
+process.load("Configuration.EventContent.EventContent_cff")
 process.wmnOutput = cms.OutputModule("PoolOutputModule",
       process.AODSIMEventContent,
       SelectEvents = cms.untracked.PSet(
             SelectEvents = cms.vstring('wmnsel')
       ),
-      fileName = cms.untracked.string('/data1/jalcaraz/wmnsel.root')
+      fileName = cms.untracked.string('root_files/wmnsel.root')
 )
 
+# Steering the process
 process.wmnsel = cms.Path(process.wmnSelFilter)
 process.end = cms.EndPath(process.wmnOutput)
 
