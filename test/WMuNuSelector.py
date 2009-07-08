@@ -18,10 +18,8 @@ process.wmnSelFilter = cms.EDFilter("WMuNuSelector",
       TrigTag = cms.untracked.InputTag("TriggerResults::HLT"),
       MuonTag = cms.untracked.InputTag("muons"),
       METTag = cms.untracked.InputTag("met"),
-      METType = cms.untracked.string("reco::CaloMET"),
       METIncludesMuons = cms.untracked.bool(False),
       JetTag = cms.untracked.InputTag("sisCone5CaloJets"),
-      JetType = cms.untracked.string("reco::CaloJet"),
       #
       # Main cuts ->
       MuonTrig = cms.untracked.string("HLT_Mu9"),
