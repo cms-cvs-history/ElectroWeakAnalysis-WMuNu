@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 # Process, how many events, inout files, ...
-process = cms.Process("wmnsel")
+process = cms.Process("wmnhist")
 process.maxEvents = cms.untracked.PSet(
       input = cms.untracked.int32(-1)
       #input = cms.untracked.int32(100)
@@ -12,15 +12,29 @@ process.source = cms.Source("PoolSource",
       fileNames = cms.untracked.vstring("file:PAT_test.root")
 )
 
-# Debug/info printouts
+# Printouts
 process.MessageLogger = cms.Service("MessageLogger",
-      debugModules = cms.untracked.vstring('wmnSelFilter'),
+      debugModules = cms.untracked.vstring('wmnHistBeforeCuts','wmnSelFilter','wmnHistAfterCuts'),
       cout = cms.untracked.PSet(
             default = cms.untracked.PSet( limit = cms.untracked.int32(10) ),
             threshold = cms.untracked.string('INFO')
             #threshold = cms.untracked.string('DEBUG')
       ),
       destinations = cms.untracked.vstring('cout')
+)
+
+# Histograms before selection
+process.wmnHistBeforeCuts = cms.EDAnalyzer("WMuNuPATValidator",
+      # Input collections ->
+      TrigTag = cms.untracked.InputTag("TriggerResults::HLT"),
+      MuonTag = cms.untracked.InputTag("selectedLayer1Muons"),
+      METTag = cms.untracked.InputTag("layer1METs"),
+      METIncludesMuons = cms.untracked.bool(True),
+      JetTag = cms.untracked.InputTag("selectedLayer1Jets"),
+      # Main cuts ->
+      MuonTrig = cms.untracked.string("HLT_Mu9"),
+      IsCombinedIso = cms.untracked.bool(False),
+      NJetMax = cms.untracked.int32(999999)
 )
 
 # Selector and parameters
@@ -61,16 +75,33 @@ process.wmnSelFilter = cms.EDFilter("WMuNuPATSelector",
       NJetMax = cms.untracked.int32(999999)
 )
 
-# Output
-process.load("Configuration.EventContent.EventContent_cff")
-process.wmnOutput = cms.OutputModule("PoolOutputModule",
-      process.AODSIMEventContent,
-      SelectEvents = cms.untracked.PSet(
-            SelectEvents = cms.vstring('wmnsel')
-      ),
-      fileName = cms.untracked.string('root_files/wmnsel.root')
+# Histograms after selection
+process.wmnHistAfterCuts = cms.EDAnalyzer("WMuNuPATValidator",
+      # Input collections ->
+      TrigTag = cms.untracked.InputTag("TriggerResults::HLT"),
+      MuonTag = cms.untracked.InputTag("selectedLayer1Muons"),
+      METTag = cms.untracked.InputTag("layer1METs"),
+      METIncludesMuons = cms.untracked.bool(True),
+      JetTag = cms.untracked.InputTag("selectedLayer1Jets"),
+      # Main cuts ->
+      MuonTrig = cms.untracked.string("HLT_Mu9"),
+      IsCombinedIso = cms.untracked.bool(False),
+      NJetMax = cms.untracked.int32(999999)
 )
 
+# Output events
+process.load("Configuration.EventContent.EventContent_cff")
+process.wmnOutput = cms.OutputModule("PoolOutputModule",
+    process.AODSIMEventContent,
+    SelectEvents = cms.untracked.PSet(
+        SelectEvents = cms.vstring('wmnhist')
+    ),
+    fileName = cms.untracked.string('root_files/WMuNu_events.root')
+)
+
+# Output histograms
+process.TFileService = cms.Service("TFileService", fileName = cms.string('WMuNu_histograms.root') )
+
 # Steering the process
-process.wmnsel = cms.Path(process.wmnSelFilter)
+process.wmnhist = cms.Path(process.wmnHistBeforeCuts+process.wmnSelFilter+process.wmnHistAfterCuts)
 process.end = cms.EndPath(process.wmnOutput)
