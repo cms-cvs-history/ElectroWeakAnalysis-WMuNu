@@ -24,7 +24,7 @@ process.MessageLogger = cms.Service("MessageLogger",
 )
 
 # Histograms before selection
-process.wmnHistBeforeCuts = cms.EDAnalyzer("WMuNuPATValidator",
+process.wmnHistBeforeCuts = cms.EDAnalyzer("WMuNuValidator",
       # Input collections ->
       TrigTag = cms.untracked.InputTag("TriggerResults::HLT"),
       MuonTag = cms.untracked.InputTag("selectedLayer1Muons"),
@@ -38,7 +38,7 @@ process.wmnHistBeforeCuts = cms.EDAnalyzer("WMuNuPATValidator",
 )
 
 # Selector and parameters
-process.wmnSelFilter = cms.EDFilter("WMuNuPATSelector",
+process.wmnSelFilter = cms.EDFilter("WMuNuSelector",
       # Input collections ->
       TrigTag = cms.untracked.InputTag("TriggerResults::HLT"),
       MuonTag = cms.untracked.InputTag("selectedLayer1Muons"),
@@ -76,7 +76,7 @@ process.wmnSelFilter = cms.EDFilter("WMuNuPATSelector",
 )
 
 # Histograms after selection
-process.wmnHistAfterCuts = cms.EDAnalyzer("WMuNuPATValidator",
+process.wmnHistAfterCuts = cms.EDAnalyzer("WMuNuValidator",
       # Input collections ->
       TrigTag = cms.untracked.InputTag("TriggerResults::HLT"),
       MuonTag = cms.untracked.InputTag("selectedLayer1Muons"),

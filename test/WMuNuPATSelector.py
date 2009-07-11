@@ -24,7 +24,7 @@ process.MessageLogger = cms.Service("MessageLogger",
 )
 
 # Selector and parameters
-process.wmnSelFilter = cms.EDFilter("WMuNuPATSelector",
+process.wmnSelFilter = cms.EDFilter("WMuNuSelector",
       # Input collections ->
       TrigTag = cms.untracked.InputTag("TriggerResults::HLT"),
       MuonTag = cms.untracked.InputTag("selectedLayer1Muons"),
