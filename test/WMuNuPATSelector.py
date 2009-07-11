@@ -24,7 +24,7 @@ process.MessageLogger = cms.Service("MessageLogger",
 )
 
 # Selector and parameters
-process.wmnSelFilter = cms.EDFilter("WMuNuSelector",
+process.wmnSelFilter = cms.EDFilter("WMuNuPATSelector",
       # Input collections ->
       TrigTag = cms.untracked.InputTag("TriggerResults::HLT"),
       MuonTag = cms.untracked.InputTag("selectedLayer1Muons"),
@@ -70,6 +70,9 @@ process.wmnOutput = cms.OutputModule("PoolOutputModule",
       ),
       fileName = cms.untracked.string('root_files/wmnsel.root')
 )
+
+# Output histograms
+process.TFileService = cms.Service("TFileService", fileName = cms.string('WMuNu_histograms.root') )
 
 # Steering the process
 process.wmnsel = cms.Path(process.wmnSelFilter)
