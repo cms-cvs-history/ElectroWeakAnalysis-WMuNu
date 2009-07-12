@@ -26,6 +26,9 @@ process.MessageLogger = cms.Service("MessageLogger",
 
 # Selector and parameters
 process.wmnSelFilter = cms.EDFilter("WMuNuAODSelector",
+      # Fast selection flag (no histograms or book-keeping) ->
+      FastOption = cms.untracked.bool(True),
+
       # Input collections ->
       TrigTag = cms.untracked.InputTag("TriggerResults::HLT"),
       MuonTag = cms.untracked.InputTag("muons"),
@@ -73,7 +76,7 @@ process.wmnOutput = cms.OutputModule("PoolOutputModule",
 )
 
 # Output histograms
-process.TFileService = cms.Service("TFileService", fileName = cms.string('WMuNu_histograms.root') )
+#process.TFileService = cms.Service("TFileService", fileName = cms.string('WMuNu_histograms.root') )
 
 # Steering the process
 process.wmnsel = cms.Path(process.wmnSelFilter)

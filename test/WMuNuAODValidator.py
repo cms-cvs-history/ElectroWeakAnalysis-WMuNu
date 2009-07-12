@@ -9,7 +9,8 @@ process.maxEvents = cms.untracked.PSet(
 process.source = cms.Source("PoolSource",
       debugVerbosity = cms.untracked.uint32(0),
       debugFlag = cms.untracked.bool(False),
-      fileNames = cms.untracked.vstring("file:PAT_test.root")
+      #fileNames = cms.untracked.vstring("file:/data4/RelValWM_CMSSW_3_1_0-STARTUP31X_V1-v1_GEN-SIM-RECO/40BFAA1A-5466-DE11-B792-001D09F29533.root")
+      fileNames = cms.untracked.vstring("file:/data4/Wmunu-Summer09-MC_31X_V2_preproduction_311-v1/0011/F4C91F77-766D-DE11-981F-00163E1124E7.root")
 )
 
 # Debug/info printouts
@@ -24,16 +25,16 @@ process.MessageLogger = cms.Service("MessageLogger",
 )
 
 # Selector and parameters
-process.wmnSelFilter = cms.EDFilter("WMuNuPATSelector",
+process.wmnSelFilter = cms.EDFilter("WMuNuAODSelector",
       # Fast selection flag (no histograms or book-keeping) ->
-      FastOption = cms.untracked.bool(True),
+      FastOption = cms.untracked.bool(False),
 
       # Input collections ->
       TrigTag = cms.untracked.InputTag("TriggerResults::HLT"),
-      MuonTag = cms.untracked.InputTag("selectedLayer1Muons"),
-      METTag = cms.untracked.InputTag("layer1METs"),
-      METIncludesMuons = cms.untracked.bool(True),
-      JetTag = cms.untracked.InputTag("selectedLayer1Jets"),
+      MuonTag = cms.untracked.InputTag("muons"),
+      METTag = cms.untracked.InputTag("met"),
+      METIncludesMuons = cms.untracked.bool(False),
+      JetTag = cms.untracked.InputTag("sisCone5CaloJets"),
       
       # Main cuts ->
       MuonTrig = cms.untracked.string("HLT_Mu9"),
@@ -65,18 +66,18 @@ process.wmnSelFilter = cms.EDFilter("WMuNuPATSelector",
 )
 
 # Output
-process.load("Configuration.EventContent.EventContent_cff")
-process.wmnOutput = cms.OutputModule("PoolOutputModule",
-      process.AODSIMEventContent,
-      SelectEvents = cms.untracked.PSet(
-            SelectEvents = cms.vstring('wmnsel')
-      ),
-      fileName = cms.untracked.string('root_files/wmnsel.root')
-)
+#process.load("Configuration.EventContent.EventContent_cff")
+#process.wmnOutput = cms.OutputModule("PoolOutputModule",
+#      process.AODSIMEventContent,
+#      SelectEvents = cms.untracked.PSet(
+#            SelectEvents = cms.vstring('wmnsel')
+#      ),
+#      fileName = cms.untracked.string('root_files/wmnsel.root')
+#)
 
 # Output histograms
-#process.TFileService = cms.Service("TFileService", fileName = cms.string('WMuNu_histograms.root') )
+process.TFileService = cms.Service("TFileService", fileName = cms.string('WMuNu_histograms.root') )
 
 # Steering the process
 process.wmnsel = cms.Path(process.wmnSelFilter)
-process.end = cms.EndPath(process.wmnOutput)
+#process.end = cms.EndPath(process.wmnOutput)

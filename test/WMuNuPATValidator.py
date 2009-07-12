@@ -26,7 +26,7 @@ process.MessageLogger = cms.Service("MessageLogger",
 # Selector and parameters
 process.wmnSelFilter = cms.EDFilter("WMuNuPATSelector",
       # Fast selection flag (no histograms or book-keeping) ->
-      FastOption = cms.untracked.bool(True),
+      FastOption = cms.untracked.bool(False),
 
       # Input collections ->
       TrigTag = cms.untracked.InputTag("TriggerResults::HLT"),
@@ -65,18 +65,18 @@ process.wmnSelFilter = cms.EDFilter("WMuNuPATSelector",
 )
 
 # Output
-process.load("Configuration.EventContent.EventContent_cff")
-process.wmnOutput = cms.OutputModule("PoolOutputModule",
-      process.AODSIMEventContent,
-      SelectEvents = cms.untracked.PSet(
-            SelectEvents = cms.vstring('wmnsel')
-      ),
-      fileName = cms.untracked.string('root_files/wmnsel.root')
-)
+#process.load("Configuration.EventContent.EventContent_cff")
+#process.wmnOutput = cms.OutputModule("PoolOutputModule",
+#      process.AODSIMEventContent,
+#      SelectEvents = cms.untracked.PSet(
+#            SelectEvents = cms.vstring('wmnsel')
+#      ),
+#      fileName = cms.untracked.string('root_files/wmnsel.root')
+#)
 
 # Output histograms
-#process.TFileService = cms.Service("TFileService", fileName = cms.string('WMuNu_histograms.root') )
+process.TFileService = cms.Service("TFileService", fileName = cms.string('WMuNu_histograms.root') )
 
 # Steering the process
 process.wmnsel = cms.Path(process.wmnSelFilter)
-process.end = cms.EndPath(process.wmnOutput)
+#process.end = cms.EndPath(process.wmnOutput)
