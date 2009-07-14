@@ -1,0 +1,3 @@
+<use name=PhysicsTools/Utilities>
+<bin name=WMuNuValidatorMacro file=WMuNuValidatorMacro.cpp>
+</bin>
