@@ -1,3 +1,4 @@
 <use name=PhysicsTools/Utilities>
 <bin name=WMuNuValidatorMacro file=WMuNuValidatorMacro.cpp>
+      <flags LDFLAGS = -lRint>
 </bin>
