@@ -14,7 +14,7 @@ process.source = cms.Source("PoolSource",
 
 # Debug/info printouts
 process.MessageLogger = cms.Service("MessageLogger",
-      debugModules = cms.untracked.vstring('distortedMuons','wmnSelFilter'),
+      debugModules = cms.untracked.vstring('distortedMuons','wmnSelFilter','genMatchMap'),
       cout = cms.untracked.PSet(
             default = cms.untracked.PSet( limit = cms.untracked.int32(10) ),
             threshold = cms.untracked.string('INFO')
@@ -23,12 +23,22 @@ process.MessageLogger = cms.Service("MessageLogger",
       destinations = cms.untracked.vstring('cout')
 )
 
+process.genMatchMap = cms.EDFilter("MCTruthDeltaRMatcherNew",
+    src = cms.InputTag("muons"),
+    matched = cms.InputTag("genParticles"),
+    distMin = cms.double(0.15),
+    matchPDGId = cms.vint32(13)
+)
+
 # Selector and parameters
 process.distortedMuons = cms.EDFilter("DistortedMuonProducer",
       MuonTag = cms.untracked.InputTag("muons"),
-      MomentumScaleShift = cms.untracked.double(3.e-3),
-      UncertaintyOnOneOverPt = cms.untracked.double(2.e-4), #in [1/GeV]
-      RelativeUncertaintyOnPt = cms.untracked.double(1.e-3)
+      GenMatchTag = cms.untracked.InputTag("genMatchMap"),
+      EtaBinEdges = cms.untracked.vdouble(-2.1,2.1), # one more entry than next vectors
+      MomentumScaleShift = cms.untracked.vdouble(1.e-3),
+      UncertaintyOnOneOverPt = cms.untracked.vdouble(2.e-4), #in [1/GeV]
+      RelativeUncertaintyOnPt = cms.untracked.vdouble(1.e-3),
+      EfficiencyRatioOverMC = cms.untracked.vdouble(0.99)
 )
 
 process.wmnSelFilter = cms.EDFilter("WMuNuAODSelector",
@@ -94,5 +104,5 @@ process.wmnOutput = cms.OutputModule("PoolOutputModule",
 #process.TFileService = cms.Service("TFileService", fileName = cms.string('WMuNu_histograms.root') )
 
 # Steering the process
-process.distortMuons = cms.Path(process.distortedMuons*process.wmnSelFilter)
+process.distortMuons = cms.Path(process.genMatchMap*process.distortedMuons*process.wmnSelFilter)
 process.end = cms.EndPath(process.wmnOutput)
