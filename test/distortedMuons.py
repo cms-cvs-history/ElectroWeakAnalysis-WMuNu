@@ -41,7 +41,7 @@ process.distortedMuons = cms.EDFilter("DistortedMuonProducer",
       EfficiencyRatioOverMC = cms.untracked.vdouble(0.99)
 )
 
-process.wmnSelFilter = cms.EDFilter("WMuNuAODSelector",
+process.wmnSelFilter = cms.EDFilter("WMuNuValidator",
       # Fast selection flag (no histograms or book-keeping) ->
       FastOption = cms.untracked.bool(True),
 
