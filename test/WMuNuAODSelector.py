@@ -25,7 +25,7 @@ process.MessageLogger = cms.Service("MessageLogger",
 )
 
 # Selector and parameters
-process.wmnSelFilter = cms.EDFilter("WMuNuAODSelector",
+process.wmnSelFilter = cms.EDFilter("WMuNuValidator",
       # Fast selection flag (no histograms or book-keeping) ->
       FastOption = cms.untracked.bool(True),
 
