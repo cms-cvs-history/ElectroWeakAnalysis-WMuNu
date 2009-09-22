@@ -38,7 +38,6 @@ process.wmnSelFilter = cms.EDFilter("WMuNuValidator",
       
       # Main cuts ->
       MuonTrig = cms.untracked.string("HLT_Mu9"),
-      UseTrackerPt = cms.untracked.bool(True),
       PtCut = cms.untracked.double(25.0),
       EtaCut = cms.untracked.double(2.1),
       IsRelativeIso = cms.untracked.bool(True),
