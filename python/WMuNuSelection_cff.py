@@ -1,35 +1,15 @@
 import FWCore.ParameterSet.Config as cms
 
-# Process, how many events, inout files, ...
-process = cms.Process("wmunuplots")
-process.maxEvents = cms.untracked.PSet(
-      #input = cms.untracked.int32(-1)
-      input = cms.untracked.int32(1053)
-)
-process.source = cms.Source("PoolSource",
-      debugVerbosity = cms.untracked.uint32(0),
-      debugFlag = cms.untracked.bool(False),
-      fileNames = cms.untracked.vstring("file:AOD_with_WCandidates.root")
-)
+from ElectroWeakAnalysis.WMuNu.wmunusProducer_cfi import *
 
-# Debug/info printouts
-process.MessageLogger = cms.Service("MessageLogger",
-      debugModules = cms.untracked.vstring('corMetWMuNus','selcorMet'),
-      cout = cms.untracked.PSet(
-            default = cms.untracked.PSet( limit = cms.untracked.int32(-1) ),
-            #threshold = cms.untracked.string('INFO')
-            threshold = cms.untracked.string('DEBUG')
-      ),
-      destinations = cms.untracked.vstring('cout')
-)
-
-process.selcorMet = cms.EDFilter("WMuNuSelector",
+selcorMet = cms.EDFilter("WMuNuSelector",
       # Fill Basc Histograms? ->
-      plotHistograms = cms.untracked.bool(True),
+      plotHistograms = cms.untracked.bool(False),
 
       # Input collections ->
       MuonTag = cms.untracked.InputTag("muons"),
       METTag = cms.untracked.InputTag("corMetGlobalMuons"),
+      METIncludesMuons = cms.untracked.bool(True),
       JetTag = cms.untracked.InputTag("sisCone5CaloJets"),
       WMuNuCollectionTag = cms.untracked.InputTag("corMetWMuNus:WMuNuCandidates"),
 
@@ -62,16 +42,10 @@ process.selcorMet = cms.EDFilter("WMuNuSelector",
       SelectByCharge=cms.untracked.int32(0)
 
 )
-process.selpfMet = cms.EDFilter("WMuNuSelector",
-      # Fill Basc Histograms? ->
-      plotHistograms = cms.untracked.bool(True),
 
-      # Preselection! 
-      MuonTrig = cms.untracked.string("HLT_Mu9"),
-      PtThrForZ1 = cms.untracked.double(20.0),
-      PtThrForZ2 = cms.untracked.double(10.0),
-      EJetMin = cms.untracked.double(40.),
-      NJetMax = cms.untracked.int32(999999),
+selpfMet = cms.EDFilter("WMuNuSelector",
+      # Fill Basc Histograms? ->
+      plotHistograms = cms.untracked.bool(False),
 
       # Input collections ->
       MuonTag = cms.untracked.InputTag("muons"),
@@ -80,7 +54,14 @@ process.selpfMet = cms.EDFilter("WMuNuSelector",
       JetTag = cms.untracked.InputTag("sisCone5CaloJets"),
       WMuNuCollectionTag = cms.untracked.InputTag("pfMetWMuNus:WMuNuCandidates"),
 
-      # Main cuts ->
+      # Preselection! 
+      MuonTrig = cms.untracked.string("HLT_Mu9"),
+      PtThrForZ1 = cms.untracked.double(20.0),
+      PtThrForZ2 = cms.untracked.double(10.0),
+      EJetMin = cms.untracked.double(40.),
+      NJetMax = cms.untracked.int32(999999),
+
+      # Main cuts -> 
       UseTrackerPt = cms.untracked.bool(True),
       PtCut = cms.untracked.double(25.0),
       EtaCut = cms.untracked.double(2.1),
@@ -103,9 +84,10 @@ process.selpfMet = cms.EDFilter("WMuNuSelector",
       SelectByCharge=cms.untracked.int32(0)
 
 )
-process.seltcMet = cms.EDFilter("WMuNuSelector",
+
+seltcMet = cms.EDFilter("WMuNuSelector",
       # Fill Basc Histograms? ->
-      plotHistograms = cms.untracked.bool(True),
+      plotHistograms = cms.untracked.bool(False),
 
       # Input collections ->
       MuonTag = cms.untracked.InputTag("muons"),
@@ -145,13 +127,10 @@ process.seltcMet = cms.EDFilter("WMuNuSelector",
 
 )
 
-process.TFileService = cms.Service("TFileService", fileName = cms.string('WMuNuBasicPlots.root') )
+selectCaloWMuNus = cms.Sequence(corMetWMuNus+selcorMet)
 
+selectPfMetWMuNus = cms.Sequence(pfMetWMuNus+selpfMet)
 
-# Steering the process
-process.path1 = cms.Path(process.selcorMet)
-process.path2 = cms.Path(process.selpfMet)
-process.path3 = cms.Path(process.seltcMet)
-
+selectTcMetWMuNus = cms.Sequence(tcMetWMuNus+seltcMet)
 
 
