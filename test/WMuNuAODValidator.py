@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 # Process, how many events, inout files, ...
 process = cms.Process("wmnsel")
 process.maxEvents = cms.untracked.PSet(
-      input = cms.untracked.int32(-1)
+      input = cms.untracked.int32(200)
       #input = cms.untracked.int32(100)
 )
 process.source = cms.Source("PoolSource",
