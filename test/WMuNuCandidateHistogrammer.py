@@ -31,7 +31,7 @@ process.selcorMet = cms.EDFilter("WMuNuSelector",
       MuonTag = cms.untracked.InputTag("muons"),
       METTag = cms.untracked.InputTag("corMetGlobalMuons"),
       JetTag = cms.untracked.InputTag("sisCone5CaloJets"),
-      WMuNuCollectionTag = cms.untracked.InputTag("corMetWMuNus:WMuNuCandidates"),
+      WMuNuCollectionTag = cms.untracked.InputTag("corMetWMuNus"),
 
       # Preselection! 
       MuonTrig = cms.untracked.string("HLT_Mu9"),
@@ -78,7 +78,7 @@ process.selpfMet = cms.EDFilter("WMuNuSelector",
       METTag = cms.untracked.InputTag("pfMet"),
       METIncludesMuons = cms.untracked.bool(True),
       JetTag = cms.untracked.InputTag("sisCone5CaloJets"),
-      WMuNuCollectionTag = cms.untracked.InputTag("pfMetWMuNus:WMuNuCandidates"),
+      WMuNuCollectionTag = cms.untracked.InputTag("pfMetWMuNus"),
 
       # Main cuts ->
       UseTrackerPt = cms.untracked.bool(True),
@@ -112,7 +112,7 @@ process.seltcMet = cms.EDFilter("WMuNuSelector",
       METTag = cms.untracked.InputTag("tcMet"),
       METIncludesMuons = cms.untracked.bool(True),
       JetTag = cms.untracked.InputTag("sisCone5CaloJets"),
-      WMuNuCollectionTag = cms.untracked.InputTag("tcMetWMuNus:WMuNuCandidates"),
+      WMuNuCollectionTag = cms.untracked.InputTag("tcMetWMuNus"),
 
       # Preselection! 
       MuonTrig = cms.untracked.string("HLT_Mu9"),
