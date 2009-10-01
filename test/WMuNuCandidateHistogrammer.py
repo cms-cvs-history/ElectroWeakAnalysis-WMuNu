@@ -3,13 +3,29 @@ import FWCore.ParameterSet.Config as cms
 # Process, how many events, inout files, ...
 process = cms.Process("wmunuplots")
 process.maxEvents = cms.untracked.PSet(
-      #input = cms.untracked.int32(-1)
-      input = cms.untracked.int32(1053)
+      input = cms.untracked.int32(-1)
 )
 process.source = cms.Source("PoolSource",
       debugVerbosity = cms.untracked.uint32(0),
       debugFlag = cms.untracked.bool(False),
-      fileNames = cms.untracked.vstring("file:AOD_with_WCandidates.root")
+       
+     # fileNames = cms.untracked.vstring(
+     #         '/store/user/cepeda/mytestSkim_PTR_Wmunu_10pb/EWK_WMuNu_SubSkim_31Xv3_1.root',
+     #         '/store/user/cepeda/mytestSkim_PTR_Wmunu_10pb/EWK_WMuNu_SubSkim_31Xv3_2.root',
+     #         '/store/user/cepeda/mytestSkim_PTR_Wmunu_10pb/EWK_WMuNu_SubSkim_31Xv3_3.root',
+     #         '/store/user/cepeda/mytestSkim_PTR_Wmunu_10pb/EWK_WMuNu_SubSkim_31Xv3_4.root',
+     #         '/store/user/cepeda/mytestSkim_PTR_Wmunu_10pb/EWK_WMuNu_SubSkim_31Xv3_5.root',
+     #         '/store/user/cepeda/mytestSkim_PTR_Wmunu_10pb/EWK_WMuNu_SubSkim_31Xv3_6.root',
+     #         '/store/user/cepeda/mytestSkim_PTR_Wmunu_10pb/EWK_WMuNu_SubSkim_31Xv3_7.root',
+     #         '/store/user/cepeda/mytestSkim_PTR_Wmunu_10pb/EWK_WMuNu_SubSkim_31Xv3_8.root',
+     #         '/store/user/cepeda/mytestSkim_PTR_Wmunu_10pb/EWK_WMuNu_SubSkim_31Xv3_9.root',
+     #         '/store/user/cepeda/mytestSkim_PTR_Wmunu_10pb/EWK_WMuNu_SubSkim_31Xv3_10.root'
+     #)                  
+      
+     fileNames = cms.untracked.vstring(
+         "file:EWK_WMuNu_SubSkim_31Xv3.root"
+      #   "file:AOD_with_WCandidates.root"
+     )
 )
 
 # Debug/info printouts
@@ -29,8 +45,8 @@ process.selcorMet = cms.EDFilter("WMuNuSelector",
 
       # Input collections ->
       MuonTag = cms.untracked.InputTag("muons"),
-      METTag = cms.untracked.InputTag("corMetGlobalMuons"),
-      JetTag = cms.untracked.InputTag("sisCone5CaloJets"),
+      TrigTag = cms.untracked.InputTag("TriggerResults::HLT8E29"),
+      JetTag = cms.untracked.InputTag("antikt5CaloJets"),
       WMuNuCollectionTag = cms.untracked.InputTag("corMetWMuNus"),
 
       # Preselection! 
@@ -75,9 +91,8 @@ process.selpfMet = cms.EDFilter("WMuNuSelector",
 
       # Input collections ->
       MuonTag = cms.untracked.InputTag("muons"),
-      METTag = cms.untracked.InputTag("pfMet"),
-      METIncludesMuons = cms.untracked.bool(True),
-      JetTag = cms.untracked.InputTag("sisCone5CaloJets"),
+      TrigTag = cms.untracked.InputTag("TriggerResults::HLT8E29"),
+      JetTag = cms.untracked.InputTag("antikt5CaloJets"),
       WMuNuCollectionTag = cms.untracked.InputTag("pfMetWMuNus"),
 
       # Main cuts ->
@@ -109,9 +124,8 @@ process.seltcMet = cms.EDFilter("WMuNuSelector",
 
       # Input collections ->
       MuonTag = cms.untracked.InputTag("muons"),
-      METTag = cms.untracked.InputTag("tcMet"),
-      METIncludesMuons = cms.untracked.bool(True),
-      JetTag = cms.untracked.InputTag("sisCone5CaloJets"),
+      TrigTag = cms.untracked.InputTag("TriggerResults::HLT8E29"),
+      JetTag = cms.untracked.InputTag("antikt5CaloJets"),
       WMuNuCollectionTag = cms.untracked.InputTag("tcMetWMuNus"),
 
       # Preselection! 
